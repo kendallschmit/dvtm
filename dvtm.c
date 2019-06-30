@@ -1911,7 +1911,8 @@ main(int argc, char *argv[]) {
 
 		for (Client *c = clients; c; c = c->next) {
 			if (FD_ISSET(vt_pty_get(c->term), &rd)) {
-				if (vt_process(c->term) < 0 && errno == EIO) {
+				int r = vt_process(c->term);
+				if (r == 0 || (r < 0 && errno == EIO)) {
 					if (c->editor)
 						c->editor_died = true;
 					else

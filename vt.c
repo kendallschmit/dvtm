@@ -1411,8 +1411,8 @@ int vt_process(Vt *t)
 	}
 
 	res = read(t->pty, t->rbuf + t->rlen, sizeof(t->rbuf) - t->rlen);
-	if (res < 0)
-		return -1;
+	if (res <= 0)
+		return res;
 
 	t->rlen += res;
 	while (pos < t->rlen) {
@@ -1423,7 +1423,7 @@ int vt_process(Vt *t)
 		if (len == -2) {
 			t->rlen -= pos;
 			memmove(t->rbuf, t->rbuf + pos, t->rlen);
-			return 0;
+			return res;
 		}
 
 		if (len == -1) {
@@ -1437,7 +1437,7 @@ int vt_process(Vt *t)
 
 	t->rlen -= pos;
 	memmove(t->rbuf, t->rbuf + pos, t->rlen);
-	return 0;
+	return res;
 }
 
 void vt_default_colors_set(Vt *t, attr_t attrs, short fg, short bg)
